@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Exists, OuterRef
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import filters, viewsets
@@ -16,10 +16,9 @@ from .mixins import FavoritMixins, FollovMixins, ListRetriveViewSet
 from .pagination import CustomPaginator
 from .permissions import IsAdminOrReadOnly
 from .serializers import (FavoriteSerializer, FollovSerializer,
-                          IngredientSerializer, ModUserCreateSerializer,
+                          IngredientSerializer, TagSerializer,
                           ModUserSerializer, RecipeSerializer,
-                          RecipeSerializerCreate, ShoppingCartSerializer,
-                          TagSerializer)
+                          RecipeSerializerCreate, ShoppingCartSerializer)
 
 # from users.models import User
 
