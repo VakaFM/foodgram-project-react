@@ -3,22 +3,21 @@ from django.db.models import Count, Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from recipes.models import (Favorite, Follov, Ingredient, Recipe, ShoppingCart,
+                            Tag)
 from rest_framework import filters, viewsets
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
-
-from recipes.models import (Favorite, Follov, Ingredient, Recipe, ShoppingCart,
-                            Tag)
 
 from .filters import FilterRecipe
 from .mixins import FavoritMixins, FollovMixins, ListRetriveViewSet
 from .pagination import CustomPaginator
 from .permissions import IsAdminOrReadOnly
 from .serializers import (FavoriteSerializer, FollovSerializer,
-                          IngredientSerializer, TagSerializer,
-                          ModUserSerializer, RecipeSerializer,
-                          RecipeSerializerCreate, ShoppingCartSerializer)
+                          IngredientSerializer, ModUserSerializer,
+                          RecipeSerializer, RecipeSerializerCreate,
+                          ShoppingCartSerializer, TagSerializer)
 
 # from users.models import User
 
@@ -100,7 +99,7 @@ class FollovViewSet(GenericViewSet, ListModelMixin):
         return (self.request.user.follower.all()
                 .annotate(recipes_count=Count('author__recipes'))
                 .annotate(is_subscribed=Exists(Follov.objects.filter(
-                 user_id=user_id, author__id=OuterRef('id')))))
+                    user_id=user_id, author__id=OuterRef('id')))))
 
     def perform_create(self, serializer):
         author = get_object_or_404(User, id=self.kwargs.get('author_id'))

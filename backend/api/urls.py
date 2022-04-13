@@ -34,4 +34,4 @@ urlpatterns = [
     path('users/<int:author_id>/subscribe/',
          FollovChangeViewSet.as_view({'post': 'create', 'delete': 'destroy'})),
     path('', include(router_v1.urls))
-    ]
+]

@@ -2,10 +2,9 @@
 from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers
-
 from recipes.models import (Favorite, Follov, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
+from rest_framework import serializers
 from users.models import User
 
 from .fields import ImageField
@@ -62,8 +61,7 @@ class RecipesIngredientsSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = ModUserSerializer(read_only=True)
-    ingredients = RecipesIngredientsSerializer(
-                                               source='recipe_ingredient',
+    ingredients = RecipesIngredientsSerializer(source='recipe_ingredient',
                                                many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
