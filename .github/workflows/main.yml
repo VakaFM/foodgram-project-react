@@ -42,7 +42,7 @@ jobs:
         with:
           push: true
           context: backend/
-          tags: VakaFM/foodgram:latest
+          tags: vakafm/foodgram:latest
 
   deploy:
     runs-on: ubuntu-latest
