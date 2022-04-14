@@ -1,4 +1,5 @@
 from django_filters import BooleanFilter, FilterSet, ModelMultipleChoiceFilter
+
 from recipes.models import Recipe, Tag
 
 
