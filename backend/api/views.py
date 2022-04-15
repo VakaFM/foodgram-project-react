@@ -10,7 +10,6 @@ from rest_framework.viewsets import GenericViewSet
 
 from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
                             Tag)
-
 from .filters import FilterRecipe
 from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
 from .pagination import CustomPaginator
@@ -19,8 +18,6 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, ModUserSerializer,
                           RecipeSerializer, RecipeSerializerCreate,
                           ShoppingCartSerializer, TagSerializer)
-
-# from users.models import User
 
 
 User = get_user_model()

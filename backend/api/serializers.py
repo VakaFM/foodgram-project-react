@@ -6,7 +6,6 @@ from rest_framework import serializers
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.models import User
-
 from .fields import ImageField
 
 
@@ -123,16 +122,17 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
     def validate_ingredients(self, ingredients):
         if not ingredients:
             raise serializers.ValidationError('Добавьте ингредиенты')
-        ingredients = self.initial_data.get('ingredients')
-        ingredient_list = []
-        for ingredient_item in ingredients:
-            ingredient = get_object_or_404(
-                Ingredient, id=ingredient_item['id']
-            )
-            if ingredient in ingredient_list:
+        ingredients_list = []
+        for ingredient in ingredients:
+            ingredient_obj = ingredient.get('id')
+            if ingredient.get('amount') <= 0:
                 raise serializers.ValidationError(
-                    'Ингредиенты не должны повторяться'
-                )
+                    'Добавьте ингредиенты')
+            if ingredient_obj.id in ingredients_list:
+                raise serializers.ValidationError(
+                    'Ингредиенты не должны повторяться')
+            ingredients_list.append(ingredient_obj.id)
+        return ingredients
 
     def validate_cooking_time(self, data):
         if data <= 0:
