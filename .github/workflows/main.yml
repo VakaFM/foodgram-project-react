@@ -63,6 +63,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
+          cd /home/vansitniko/foodgram-project-react
           sudo docker pull vakafm/foodgram_backend:latest
           sudo docker pull vakafm/foodgram_frontend:latest
           sudo docker-compose stop
