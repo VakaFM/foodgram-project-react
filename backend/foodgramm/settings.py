@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'recipes',
     'foodgramm',
     'users',
-    'django_filters',
+    'django_filter',
 ]
 
 MIDDLEWARE = [
