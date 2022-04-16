@@ -64,20 +64,12 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-          cd /home/vansitniko/foodgram-project-react
           sudo docker pull vakafm/foodgram_backend:latest
           sudo docker pull vakafm/foodgram_frontend:latest
           sudo docker-compose stop
           sudo docker-compose rm backend
-
-    - name: docker-compose up
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.PASSPHRASE }}
-        script: |
+          sudo docker-compose rm frontend
+          rm .env
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
@@ -87,7 +79,6 @@ jobs:
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
           echo SECRET_KEY="${{ secrets.SECRET_KEY }}" >> .env
           sudo docker-compose up -d --build
-
 
   send_message:
     runs-on: ubuntu-latest
