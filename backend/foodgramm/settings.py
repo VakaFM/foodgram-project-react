@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'foodgramm',
     'users',
     'django_filters',
+    'django-debug-toolbar',
 ]
 
 MIDDLEWARE = [
