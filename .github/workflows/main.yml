@@ -64,7 +64,7 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           sudo docker pull vakafm/foodgram_backend:latest
-          sudo docker vakafm/foodgram_frontend:latest
+          sudo docker pull vakafm/foodgram_frontend:latest
           cd infra/
           sudo docker-compose stop
           sudo docker-compose rm backend
