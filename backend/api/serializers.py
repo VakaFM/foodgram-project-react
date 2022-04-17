@@ -152,6 +152,7 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         instance = super().update(instance, validated_data)
         return self.tags_ingredients(ingredients, tags, instance)
+# 565
 
 
 class FollowSerializer(serializers.ModelSerializer):
