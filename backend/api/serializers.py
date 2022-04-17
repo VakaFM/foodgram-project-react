@@ -144,7 +144,7 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         image = validated_data.pop('image')
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(**validated_data)
+        recipe = Recipe.objects.create(author=self.author, **validated_data)
         return self.tags_ingredients(ingredients, tags, recipe, image)
 
     def update(self, instance, validated_data):
@@ -152,7 +152,6 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         instance = super().update(instance, validated_data)
         return self.tags_ingredients(ingredients, tags, instance)
-# 565
 
 
 class FollowSerializer(serializers.ModelSerializer):
