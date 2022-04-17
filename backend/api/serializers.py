@@ -120,45 +120,31 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
             )
         return recipe
 
-    # def validate_ingredients(self, ingredients):
-    #     if not ingredients:
-    #         raise serializers.ValidationError('Добавьте ингредиенты')
-    #     # ingredients_list = []
-    #     for ingredient in ingredients:
-    #         # ingredient_obj = ingredient.get('id')
-    #         if ingredient.get('amount') <= 0:
-    #             raise serializers.ValidationError(
-    #                 'Добавьте ингредиенты')
-    #         # if ingredient_obj in ingredients_list:
-    #         #     raise serializers.ValidationError(
-    #         #         'Ингредиенты не должны повторяться')
-    #         # ingredients_list.append(ingredient_obj)
-    #     return ingredients
+    def validate_ingredients(self, ingredients):
+        if not ingredients:
+            raise serializers.ValidationError('Добавьте ингредиенты')
+        ingredients_list = []
+        for ingredient in ingredients:
+            ingredient_obj = ingredient.get('id')
+            if ingredient.get('amount') <= 0:
+                raise serializers.ValidationError(
+                    'Добавьте ингредиенты')
+            if ingredient_obj in ingredients_list:
+                raise serializers.ValidationError(
+                    'Ингредиенты не должны повторяться')
+            ingredients_list.append(ingredient_obj)
+        return ingredients
 
     def validate_cooking_time(self, data):
         if data <= 0:
             raise serializers.ValidationError('Время должно быть больше 0')
         return data
 
-    def create_ingredients(self, ingredients, recipe):
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                recipe=recipe,
-                ingredient_id=ingredient.get('id'),
-                amount=ingredient.get('amount'), )
-
     def create(self, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
-        self.create_ingredients(ingredients, recipe)
-        return recipe
-    # def create(self, validated_data):
-    #     ingredients = validated_data.pop('recipe_ingredient')
-    #     tags = validated_data.pop('tags')
-    #     recipe = Recipe.objects.create(**validated_data)
-    #     return self.tags_ingredients(ingredients, tags, recipe)
+        return self.tags_ingredients(ingredients, tags, recipe)
 
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
