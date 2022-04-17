@@ -128,10 +128,10 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
             if ingredient.get('amount') <= 0:
                 raise serializers.ValidationError(
                     'Добавьте ингредиенты')
-            if ingredient_obj.id in ingredients_list:
+            if ingredient_obj in ingredients_list:
                 raise serializers.ValidationError(
                     'Ингредиенты не должны повторяться')
-            ingredients_list.append(ingredient_obj.id)
+            ingredients_list.append(ingredient_obj)
         return ingredients
 
     def validate_cooking_time(self, data):
