@@ -84,10 +84,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializerCreate(serializers.ModelSerializer):
-    # author = UserSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     ingredients = RecipesIngredientsSerializer(source='recipe_ingredient',
                                                many=True)
-    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects, many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True)
     image = ImageField()
     cooking_time = serializers.IntegerField(validators=[MinValueValidator(1)])
 
@@ -143,7 +144,7 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         image = validated_data.pop('image')
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(author=self.author, **validated_data)
+        recipe = Recipe.objects.create(**validated_data)
         return self.tags_ingredients(ingredients, tags, recipe, image)
 
     def update(self, instance, validated_data):
