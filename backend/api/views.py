@@ -52,6 +52,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return RecipeSerializerCreate
 
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+        return queryset.add_flags(self.request.user.id)
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
