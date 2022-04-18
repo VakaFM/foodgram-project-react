@@ -128,8 +128,17 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
                 Ingredient, id=items['id'])
             if ingredient in ingredient_list:
                 raise serializers.ValidationError(
-                    'Ингредиенты не должны повторяться')
+                    'Ингредиент должен быть уникальным!')
             ingredient_list.append(ingredient)
+        tags = data['tags']
+        if not tags:
+            raise serializers.ValidationError(
+                'Нужен хотя бы один тэг для рецепта!')
+        for tag_name in tags:
+            if not Tag.objects.filter(name=tag_name).exists():
+                raise serializers.ValidationError(
+                    f'Тэга {tag_name} не существует!')
+        return data
 
     def validate_cooking_time(self, data):
         if data <= 0:
