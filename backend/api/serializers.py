@@ -224,26 +224,27 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='recipe.id', read_only=True)
-    name = serializers.CharField(source='recipe.name', read_only=True)
-    cooking_time = serializers.CharField(source='recipe.cooking_time',
-                                         read_only=True)
-    image = serializers.CharField(source='recipe.image', read_only=True)
-
-    def validated(self, data):
-        request = self.context.get('request')
-        if request.method == 'DELETE':
-            return data
-        recipe_id = request.parser_context.get('kwargs').get('recipe_id')
-        recipe = get_object_or_404(Recipe, id=recipe_id)
-        user = self.context['request'].user
-        if Favorite.objects.filter(recipe=recipe, user=user).exists():
-            raise serializers.ValidationError('Такой рецепт уже добавлен')
-        return data
+    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time',)
+        model = Favorite
+        fields = ('user', 'recipe')
+
+    def validate(self, data):
+        request = self.context.get('request')
+        recipe_id = data['recipe'].id
+        favorite_exists = Favorite.objects.filter(
+            user=request.user,
+            recipe__id=recipe_id
+        ).exists()
+
+        if request.method == 'POST' and favorite_exists:
+            raise serializers.ValidationError(
+                'Рецепт уже добавлен в избранное'
+            )
+
+        return data
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
