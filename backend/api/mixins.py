@@ -23,7 +23,7 @@ class FavoritMixin(FollowMixin):
 
     def perform_create(self, serializer):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('recipe_id'))
-        serializer.save(user=self.request.user, recipe=recipe)
+        serializer.save(user=self.request.user, recipes=recipe)
 
     def destroy(self, request, *args, **kwargs):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('recipe_id'))
