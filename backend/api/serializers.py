@@ -113,19 +113,19 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         user = self.context.get('request').user
         return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
 
-    def tags_ingredients(self, tags_data, ingredients_data, recipe):
-        recipe.tags.clear()
-        recipe.ingredients.clear()
-        recipe.tags.set(tags_data)
-        for ingredient_el in ingredients_data:
-            ingredient_id = ingredient_el['ingredients'].get('id')
-            ingredient = get_object_or_404(Ingredient, id=ingredient_id)
-            RecipeIngredient.objects.update_or_create(
-                recipe=recipe,
-                ingredients=ingredient,
-                amount=ingredient_el['amount']
-            )
-        return recipe
+    # def tags_ingredients(self, tags_data, ingredients_data, recipe):
+    #     recipe.tags.clear()
+    #     recipe.ingredients.clear()
+    #     recipe.tags.set(tags_data)
+    #     for ingredient_el in ingredients_data:
+    #         ingredient_id = ingredient_el['ingredients'].get('id')
+    #         ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+    #         RecipeIngredient.objects.update_or_create(
+    #             recipe=recipe,
+    #             ingredients=ingredient,
+    #             amount=ingredient_el['amount']
+    #         )
+    #     return recipe
 
     def validate_ingredient(self, data):
         ingredients = self.initial_data.get('ingredients')
@@ -183,7 +183,7 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
         instance = super().update(instance, validated_data)
-        return self.tags_ingredients(ingredients, tags, instance)
+        return self.validate_ingredient(ingredients, tags, instance)
 
 
 class FollowSerializer(serializers.ModelSerializer):
