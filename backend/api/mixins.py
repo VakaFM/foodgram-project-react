@@ -34,4 +34,4 @@ class FavoritMixin(FollowMixin):
 
     def get_queryset(self):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('recipe_id'))
-        return self.model.objects.filter(recipe=recipe)
+        return self.model.objects.filter(recipes=recipe)
