@@ -28,7 +28,7 @@ class FavoritMixin(FollowMixin):
     def destroy(self, request, *args, **kwargs):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('recipe_id'))
         user = self.request.user
-        instance = get_object_or_404(self.model, recipe=recipe, user=user)
+        instance = get_object_or_404(self.model, recipes=recipe, user=user)
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

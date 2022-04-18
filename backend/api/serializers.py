@@ -261,7 +261,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         recipe_id = request.parser_context.get('kwargs').get('recipe_id')
         recipe = get_object_or_404(Recipe, id=recipe_id)
         user = self.context['request'].user
-        if ShoppingCart.objects.filter(recipes=recipe, user=user).exists():
+        if ShoppingCart.objects.filter(recipe=recipe, user=user).exists():
             raise serializers.ValidationError('Такой рецепт уже добавлен')
         return data
 
