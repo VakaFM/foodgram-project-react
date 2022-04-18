@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef, Sum
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
@@ -7,9 +7,9 @@ from rest_framework import filters, viewsets
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
-
+from django.http import HttpResponse
 from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
-                            Tag)
+                            Tag, RecipeIngredient)
 from .filters import FilterRecipe
 from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
 from .pagination import CustomPaginator
@@ -54,6 +54,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def download_shopping_cart(self, request):
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__shopping_cart__user=request.user
+        ).values(
+            'ingredients__name',
+            'ingredients__measurement_unit'
+        ).annotate(total_amount=Sum('amount'))
+        shopping_list = ['{} ({}) - {}\n'.format(
+            ingredient['ingredients__name'],
+            ingredient['ingredients__measurement_unit'],
+            ingredient['total_amount']
+        ) for ingredient in ingredients]
+        response = HttpResponse(shopping_list, content_type='text/plain')
+        attachment = 'attachment; filename="shopping_cart.txt"'
+        response['Content-Disposition'] = attachment
+        return response
 
 
 class ModUserViewSet(UserViewSet):
