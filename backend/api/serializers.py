@@ -120,20 +120,16 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
             )
         return recipe
 
-    def validate_ingredients(self, ingredients):
-        if not ingredients:
-            raise serializers.ValidationError('Добавьте ингредиенты')
-        ingredients_list = list()
-        for ingredient in ingredients:
-            ingredient_obj = ingredient.get('id')
-            if ingredient.get('amount') <= 0:
-                raise serializers.ValidationError(
-                    'Добавьте ингредиенты')
-            if ingredient_obj in ingredients_list:
+    def validate_ingredients(self, data):
+        ingredients = data['ingredients']
+        ingredient_list = []
+        for items in ingredients:
+            ingredient = get_object_or_404(
+                Ingredient, id=items['id'])
+            if ingredient in ingredient_list:
                 raise serializers.ValidationError(
                     'Ингредиенты не должны повторяться')
-            ingredients_list.append(ingredient_obj)
-        return ingredients
+            ingredient_list.append(ingredient)
 
     def validate_cooking_time(self, data):
         if data <= 0:
