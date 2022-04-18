@@ -27,12 +27,18 @@ class ModUserSerializer(UserSerializer):
 
 
 class ModUserCreateSerializer(UserCreateSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = User
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
-            'password')
+            'password', 'is_subscribed')
         read_only_fields = ['id']
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        return Follow.objects.filter(user=user, author=obj).exists()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -73,10 +79,13 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart',)
 
     def get_is_favorited(self, obj):
-        if not self.context['request'].user.is_authenticated:
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
             return False
-        recipes_user = self.context['request'].user.fav_recipes
-        return recipes_user.filter(recipe=obj).exists()
+        return Favorite.objects.filter(
+            user=request.user,
+            recipe=obj
+        ).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user.id
@@ -156,23 +165,12 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
         image = validated_data.pop('image')
-
-        recipe = Recipe.objects.create(
-            image=image,
-            **validated_data
-        )
-
+        recipe = Recipe.objects.create(image=image, **validated_data)
         recipe.tags.set(tags)
-
-        set_of_ingredients = [
-            RecipeIngredient(
-                recipe=recipe,
-                ingredient=get_object_or_404(
-                    Ingredient, id=item['ingredient']['id']
-                ),
-                amount=item['amount']
-            ) for item in ingredients
-        ]
+        set_of_ingredients = [RecipeIngredient(
+            recipe=recipe, ingredient=get_object_or_404(
+                Ingredient, id=item['ingredient']['id']), amount=item[
+                    'amount']) for item in ingredients]
         RecipeIngredient.objects.bulk_create(set_of_ingredients)
 
         return recipe
