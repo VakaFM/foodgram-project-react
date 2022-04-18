@@ -152,11 +152,28 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
             raise serializers.ValidationError('Время должно быть больше 0')
         return data
 
+    def create_ingredients(self, ingredients, recipe):
+        for ingredient in ingredients:
+            RecipeIngredient.objects.create(
+                recipe=recipe,
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount'),
+            )
+
     def create(self, validated_data):
-        ingredients = validated_data.pop('recipe_ingredient')
-        tags = validated_data.pop('tags')
+        validated_data.pop('recipe')
+        tags = self.initial_data.pop('tags')
+        ingredients = self.initial_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        return self.tags_ingredients(ingredients, tags, recipe)
+        recipe.tags.set(tags)
+        self.create_ingredients(ingredients, recipe)
+        return recipe
+
+    # def create(self, validated_data):
+    #     ingredients = validated_data.pop('recipe_ingredient')
+    #     tags = validated_data.pop('tags')
+    #     recipe = Recipe.objects.create(**validated_data)
+    #     return self.tags_ingredients(ingredients, tags, recipe)
 
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
