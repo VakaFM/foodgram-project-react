@@ -123,7 +123,7 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
     def validate_ingredients(self, ingredients):
         if not ingredients:
             raise serializers.ValidationError('Добавьте ингредиенты')
-        ingredients_list = []
+        ingredients_list = list()
         for ingredient in ingredients:
             ingredient_obj = ingredient.get('id')
             if ingredient.get('amount') <= 0:
