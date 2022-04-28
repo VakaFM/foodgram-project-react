@@ -1,15 +1,16 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Exists, OuterRef, Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from recipes.models import (Favorite, Follow, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart, Tag)
 from rest_framework import filters, viewsets
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
-from django.http import HttpResponse
-from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
-                            Tag, RecipeIngredient)
+
 from .filters import FilterRecipe
 from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
 from .pagination import CustomPaginator
@@ -18,7 +19,6 @@ from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, ModUserSerializer,
                           RecipeSerializer, RecipeSerializerCreate,
                           ShoppingCartSerializer, TagSerializer)
-
 
 User = get_user_model()
 

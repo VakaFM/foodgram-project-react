@@ -1,14 +1,12 @@
-from drf_extra_fields.fields import Base64ImageField
-from drf_base64.fields import Base64ImageField
-
 from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers
-
+from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
+from rest_framework import serializers
 from users.models import User
+
 # from .fields import ImageField
 
 
