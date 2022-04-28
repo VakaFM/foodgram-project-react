@@ -1,3 +1,5 @@
+from drf_extra_fields.fields import Base64ImageField
+
 from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
@@ -6,7 +8,7 @@ from rest_framework import serializers
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.models import User
-from .fields import ImageField
+# from .fields import ImageField
 
 
 class ModUserSerializer(UserSerializer):
@@ -62,6 +64,7 @@ class RecipesIngredientsSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
     tags = TagSerializer(many=True)
     author = ModUserSerializer(read_only=True)
     ingredients = RecipesIngredientsSerializer(source='recipe_ingredient',
@@ -96,7 +99,7 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
                                                many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
-    image = ImageField()
+    image = Base64ImageField()
     cooking_time = serializers.IntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
