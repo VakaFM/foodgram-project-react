@@ -90,7 +90,7 @@ class Favorite(models.Model):
                              verbose_name='Покупатель')
     recipes = models.ForeignKey(Recipe,
                                 on_delete=models.CASCADE,
-                                verbose_name='рецепт в избранном')
+                                verbose_name='рецепт в Избранном')
 
     class Meta:
         verbose_name = 'Избранное'
