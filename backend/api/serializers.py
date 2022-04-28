@@ -113,20 +113,6 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         user = self.context.get('request').user
         return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
 
-    # def tags_ingredients(self, tags_data, ingredients_data, recipe):
-    #     recipe.tags.clear()
-    #     recipe.ingredients.clear()
-    #     recipe.tags.set(tags_data)
-    #     for ingredient_el in ingredients_data:
-    #         ingredient_id = ingredient_el['ingredients'].get('id')
-    #         ingredient = get_object_or_404(Ingredient, id=ingredient_id)
-    #         RecipeIngredient.objects.update_or_create(
-    #             recipe=recipe,
-    #             ingredients=ingredient,
-    #             amount=ingredient_el['amount']
-    #         )
-    #     return recipe
-
     def validate_ingredient(self, data):
         ingredients = self.initial_data.get('ingredients')
         ingredient_list = []
@@ -172,12 +158,6 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         RecipeIngredient.objects.bulk_create(set_of_ingredients)
 
         return recipe
-
-    # def create(self, validated_data):
-    #     ingredients = validated_data.pop('recipe_ingredient')
-    #     tags = validated_data.pop('tags')
-    #     recipe = Recipe.objects.create(**validated_data)
-    #     return self.tags_ingredients(ingredients, tags, recipe)
 
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
