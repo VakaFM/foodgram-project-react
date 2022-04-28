@@ -1,12 +1,24 @@
-
 version: '3.3'
-
 services:
+  
   db:
-    image: postgres:14.2-alpine
-
+    image: postgres:13.0-alpine
+    restart: always
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    # ports:
+    #  - "5432:5432"
+
+  backend:
+    image: vakafm/foodgram_backend:latest
+    restart: always
+    volumes:
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+    depends_on:
+      - db
     env_file:
       - ./.env
 
@@ -16,35 +28,23 @@ services:
       - ../frontend/:/app/result_build/
     depends_on:
       - db
-  
-  backend:
-    image: vakafm/foodgram_backend:latest
-    restart: always
-    volumes:
-      - static_value:/app/static-backend/
-      - media_value:/app/media-backend/
-    depends_on:
-      - db
-    env_file:
-      - ./.env
 
   nginx:
-    image: nginx:1.21.6
+    image: nginx:1.19.3
     ports:
       - "80:80"
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/api/docs/
-
-      - static_value:/var/html/static-backend/
-      - media_value:/var/html/media-backend/
-    restart: always
-    depends_on: 
-      - backend
+      - ../docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
+      - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+    depends_on:
       - frontend
-
+    
 volumes:
   static_value:
   media_value:
-  dbdata: 
+  postgres_data:
+  result_build:
