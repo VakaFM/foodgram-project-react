@@ -238,7 +238,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         recipe = get_object_or_404(Recipe, id=recipe_id)
         user = self.context['request'].user
         if Favorite.objects.filter(recipe=recipe, user=user).exists():
-            raise serializers.ValidationError('Такой рецепт уже добавлен')
+            raise serializers.ValidationError('Такой рецепт уже добавлен!')
         return data
 
     class Meta:
