@@ -12,7 +12,7 @@ services:
     #  - "5432:5432"
 
   backend:
-    image: vakafm/backend:latest
+    image: vakafm/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/var/html/static/
@@ -23,7 +23,7 @@ services:
       - ./.env
 
   frontend:
-    image: vakafm/frontend:latest
+    image: vakafm/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
