@@ -15,8 +15,8 @@ services:
     image: vakafm/foodgram_backend:latest
     restart: always
     volumes:
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
+      - static_value:/static/
+      - media_value:/media/
     depends_on:
       - db
     env_file:
