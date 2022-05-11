@@ -56,8 +56,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=False, methods=['get'],
-            permission_classes=[IsAuthenticated])
+    @action(
+        methods=['GET', ],
+        url_path='download_shopping_cart',
+        detail=False,
+    )
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
             recipe__shopping_cart__user=request.user
