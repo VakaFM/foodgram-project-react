@@ -2,7 +2,7 @@ from django.urls import include, path
 from djoser.views import TokenCreateView, TokenDestroyView
 from rest_framework.routers import SimpleRouter
 
-from .views import (FavoriteViewSet, FollowChangeViewSet, FollowViewSet,
+from .views import (FavoriteViewSet, FollowViewSet,
                     IngredientViewSet, ModUserViewSet, RecipeViewSet,
                     ShoppingCartViewSet, TagViewSet)
 
