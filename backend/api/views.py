@@ -58,7 +58,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         methods=['GET', ],
-        url_path='download_shopping_cart',
+        url_path='shopping_cart',
         detail=False,
     )
     def download_shopping_cart(self, request):
