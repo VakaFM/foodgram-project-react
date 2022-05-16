@@ -6,11 +6,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
-from rest_framework import filters, viewsets
+from rest_framework import filters, viewsets, status
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
+from rest_framework.response import Response
+
 
 from .filters import FilterRecipe
 from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
@@ -130,14 +132,16 @@ class FollowChangeViewSet(FollowMixin):
     permission_classes = (IsAuthenticated)
 
     def get_queryset(self):
-        return Follow.objects.filter(user=self.request.user)
+        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+        return Follow.objects.filter(author=author)
 
     def perform_create(self, serializer):
         author = get_object_or_404(User, id=self.kwargs.get('author_id'))
         serializer.save(user=self.request.user, author=author)
 
-    def perform_delete(self, instance):
+    def destroy(self, request, *args, **kwargs):
         author = get_object_or_404(User, id=self.kwargs.get('author_id'))
         user = self.request.user
-        instance = get_object_or_404(Follow, user=user, author=author)
-        instance.delete()
+        instance = get_object_or_404(Follow, author=author, user=user)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
