@@ -135,7 +135,7 @@ class FollowChangeViewSet(FollowMixin):
         author = get_object_or_404(User, id=self.kwargs.get('author_id'))
         return Follow.objects.filter(author=author)
 
-    def perform_create(self, serializer):
+    def create(self, serializer):
         author = get_object_or_404(User, id=self.kwargs.get('author_id'))
         serializer.save(user=self.request.user, author=author)
 
