@@ -6,13 +6,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
-from rest_framework import filters, viewsets, status
+from rest_framework import filters, viewsets
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
-from rest_framework.response import Response
-
 
 from .filters import FilterRecipe
 from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
@@ -130,47 +128,17 @@ class FollowChangeViewSet(FollowMixin):
     model = Follow
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated)
-    content = (
-        {'detail': 'Страница не найдена.'},
-        {'detail': 'Вы не можете подписаться на себя.'},
-        {'detail': 'Вы уже подписаны на этого пользователя.'},
-        {'detail': 'Вы отписались от этого пользователя.'}
-    )
 
-    def list(self, request, *args, **kwargs):
-        print(super().list(request, *args, **kwargs))
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+        return Follow.objects.filter(author=author)
 
-    def create(self, request, pk):
-        if not pk.isdigit() or not User.objects.filter(
-                id=pk).values_list('id', flat=True).exists():
-            return Response(
-                data=self.content[0], status=status.HTTP_404_NOT_FOUND)
-        follower_id = request.user.id
-        user_id = pk
-        if follower_id == int(user_id):
-            return Response(
-                data=self.content[1], status=status.HTTP_400_BAD_REQUEST)
-        queryset = self.get_queryset().filter(
-            follower_id=follower_id, user_id=user_id).values_list(
-                'follower_id', 'user_id')
-        if not queryset:
-            queryset.create(follower_id=follower_id, user_id=user_id)
-            user = User.objects.get(id=user_id)
-            user.is_subscribed = True
-            user.save()
-            serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(
-            data=self.content[2], status=status.HTTP_400_BAD_REQUEST)
+    def create(self, serializer):
+        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+        serializer.save(user=self.request.user, author=author)
 
-    def destroy(self, request, pk):
-        queryset = self.get_queryset()
-        follower_id = request.user.id
-        user_id = pk
-        queryset.filter(follower_id=follower_id, user_id=user_id).delete()
-        user = User.objects.get(id=user_id)
-        user.is_subscribed = False
-        user.save()
-        return Response(
-            data=self.content[3], status=status.HTTP_204_NO_CONTENT)
+    def destroy(self, request, *args, **kwargs):
+        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+        user = self.request.user
+        instance = get_object_or_404(Follow, author=author, user=user)
+        instance.delete()
