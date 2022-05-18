@@ -148,24 +148,20 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        ingredients = validated_data.pop('recipe_ingredient')
-        tags = validated_data.pop('tags')
-        image = validated_data.pop('image')
-        recipe = Recipe.objects.create(image=image, **validated_data)
-        recipe.tags.set(tags)
-        set_of_ingredients = [RecipeIngredient(
-            recipe=recipe, ingredient=get_object_or_404(
-                Ingredient, id=item['ingredient']['id']), amount=item[
-                    'amount']) for item in ingredients]
-        RecipeIngredient.objects.bulk_create(set_of_ingredients)
-
-        return recipe
+        ingredients = validated_data.pop('ingredients')
+        tags = self.initial_data.get('tags')
+        recipe = super().create(validated_data)
+        return self.add_tags_ingredients(
+            recipe, ingredients=ingredients, tags=tags)
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('recipe_ingredient')
-        tags = validated_data.pop('tags')
-        instance = super().update(instance, validated_data)
-        return self.validate_ingredient(ingredients, tags, instance)
+        instance.ingredients.clear()
+        instance.tags.clear()
+        ingredients = validated_data.pop('ingredients')
+        tags = self.initial_data.get('tags')
+        instance = self.add_tags_ingredients(
+            instance, ingredients=ingredients, tags=tags)
+        return super().update(instance, validated_data)
 
 
 class FollowSerializer(serializers.ModelSerializer):
