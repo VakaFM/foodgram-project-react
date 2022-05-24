@@ -126,7 +126,7 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
     #     serializer.save(user=self.request.user, author=author)
 
 
-class FollowChangeViewSet(views.APIView):
+class FollowChangeView(views.APIView):
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated)
 
@@ -149,6 +149,7 @@ class FollowChangeViewSet(views.APIView):
         )
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
     # def get_queryset(self):
     #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
     #     return Follow.objects.filter(author=author)
