@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
-from rest_framework import filters, viewsets, status
+from rest_framework import filters, viewsets, status, views
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -14,7 +14,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .filters import FilterRecipe
-from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
+from .mixins import FavoritMixin, ListRetriveViewSet
 from .pagination import CustomPaginator
 from .permissions import IsAdminOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
@@ -126,7 +126,7 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
     #     serializer.save(user=self.request.user, author=author)
 
 
-class FollowChangeViewSet(FollowMixin):
+class FollowChangeViewSet(views.APIView):
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated)
 
