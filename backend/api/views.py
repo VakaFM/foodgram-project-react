@@ -6,11 +6,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
-from rest_framework import filters, viewsets
+from rest_framework import filters, viewsets, status
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .filters import FilterRecipe
 from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
@@ -19,7 +20,8 @@ from .permissions import IsAdminOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, ModUserSerializer,
                           RecipeSerializer, RecipeSerializerCreate,
-                          ShoppingCartSerializer, TagSerializer)
+                          ShoppingCartSerializer, TagSerializer,
+                          SubscribeSerializer)
 
 User = get_user_model()
 
@@ -119,26 +121,44 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
                 .annotate(is_subscribed=Exists(Follow.objects.filter(
                     user_id=user_id, author__id=OuterRef('id')))))
 
-    def perform_create(self, serializer):
-        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
-        serializer.save(user=self.request.user, author=author)
+    # def perform_create(self, serializer):
+    #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    #     serializer.save(user=self.request.user, author=author)
 
 
 class FollowChangeViewSet(FollowMixin):
-    model = Follow
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated)
 
-    def get_queryset(self):
-        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
-        return Follow.objects.filter(author=author)
-
-    def create(self, serializer):
-        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
-        serializer.save(user=self.request.user, author=author)
-
-    def destroy(self, request, *args, **kwargs):
-        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    def post(self, request, pk):
+        author = get_object_or_404(User, pk=pk)
         user = self.request.user
-        instance = get_object_or_404(Follow, author=author, user=user)
-        instance.delete()
+        data = {'author': author.id, 'user': user.id}
+        serializer = SubscribeSerializer(
+            data=data, context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, pk):
+        author = get_object_or_404(User, pk=pk)
+        user = self.request.user
+        subscription = get_object_or_404(
+            Follow, user=user, author=author
+        )
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    # def get_queryset(self):
+    #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    #     return Follow.objects.filter(author=author)
+
+    # def create(self, serializer):
+    #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    #     serializer.save(user=self.request.user, author=author)
+
+    # def destroy(self, request, *args, **kwargs):
+    #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    #     user = self.request.user
+    #     instance = get_object_or_404(Follow, author=author, user=user)
+    #     instance.delete()
