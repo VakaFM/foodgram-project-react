@@ -4,9 +4,9 @@ from django.db import models
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    # first_name = models.CharField(max_length=100)
-    # last_name = models.CharField(max_length=100)
-    # is_subscribed = models.BooleanField(default=False)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    is_subscribed = models.BooleanField(verbose_name='Подписан', default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
