@@ -127,7 +127,7 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
 
 
 class FollowChangeView(views.APIView):
-    serializer_class = FollowSerializer
+    # serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated)
 
     def post(self, request, pk):

@@ -2,7 +2,7 @@ from django.urls import include, path
 from djoser.views import TokenCreateView, TokenDestroyView
 from rest_framework.routers import SimpleRouter
 
-from .views import (FavoriteViewSet, FollowChangeViewSet, FollowViewSet,
+from .views import (FavoriteViewSet, FollowChangeView, FollowViewSet,
                     IngredientViewSet, ModUserViewSet, RecipeViewSet,
                     ShoppingCartViewSet, TagViewSet)
 
@@ -32,6 +32,6 @@ urlpatterns = [
     path('recipes/<int:recipe_id>/favorite/',
          FavoriteViewSet.as_view({'post': 'create', 'delete': 'destroy'})),
     path('users/<int:author_id>/subscribe/',
-         FollowChangeViewSet.as_view()),
+         FollowChangeView.as_view()),
     path('', include(router_v1.urls))
 ]
