@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Exists, OuterRef, Sum
+from django.db.models import Exists, OuterRef, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -115,11 +115,15 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        user_id = self.request.user.id
-        return (self.request.user.follower.all()
-                .annotate(recipes_count=Count('author__recipes'))
-                .annotate(is_subscribed=Exists(Follow.objects.filter(
-                    user_id=user_id, author__id=OuterRef('id')))))
+        user = self.request.user
+        return user.follower.all()
+
+    # def get_queryset(self):
+    #     user_id = self.request.user.id
+    #     return (self.request.user.follower.all()
+    #             .annotate(recipes_count=Count('author__recipes'))
+    #             .annotate(is_subscribed=Exists(Follow.objects.filter(
+    #                 user_id=user_id, author__id=OuterRef('id')))))
 
     # def perform_create(self, serializer):
     #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
