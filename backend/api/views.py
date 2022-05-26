@@ -14,7 +14,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 
 from .filters import FilterRecipe
-from .mixins import FavoritMixin, FollowMixin, ListRetriveViewSet
+from .mixins import FavoritMixin, ListRetriveViewSet
 from .pagination import CustomPaginator
 from .permissions import IsAdminOrReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
@@ -125,7 +125,7 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
         serializer.save(user=self.request.user, author=author)
 
 
-class FollowChangeViewSet(FollowMixin):
+class FollowChangeViewSet(UserViewSet):
     pagination_class = CustomPaginator
 
     @action(
