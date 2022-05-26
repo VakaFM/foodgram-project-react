@@ -164,8 +164,16 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
-        instance = super().update(instance, validated_data)
-        return self.validate_ingredient(ingredients, tags, instance)
+        instance.ingredients.clear()
+        self.create_ingredients(ingredients, instance)
+        instance.tags.clear()
+        instance.tags.set(tags)
+        return super().update(instance, validated_data)
+    # def update(self, instance, validated_data):
+    #     ingredients = validated_data.pop('recipe_ingredient')
+    #     tags = validated_data.pop('tags')
+    #     instance = super().update(instance, validated_data)
+    #     return self.validate_ingredient(ingredients, tags, instance)
 
 
 class FollowSerializer(serializers.ModelSerializer):
