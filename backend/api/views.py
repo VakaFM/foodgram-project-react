@@ -6,7 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
-from rest_framework import filters, viewsets
+from rest_framework import filters, viewsets, status
+from rest_framework.response import Response
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -125,20 +126,60 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
 
 
 class FollowChangeViewSet(FollowMixin):
-    model = Follow
-    serializer_class = FollowSerializer
-    permission_classes = (IsAuthenticated)
+    pagination_class = CustomPaginator
 
-    def get_queryset(self):
-        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
-        return Follow.objects.filter(author=author)
+    @action(
+        methods=['post'], detail=True, permission_classes=[IsAuthenticated])
+    def subscribe(self, request, id=None):
+        user = request.user
+        author = get_object_or_404(User, id=id)
+        follow = Follow.objects.create(user=user, author=author)
+        serializer = FollowSerializer(
+            follow, context={'request': request}
+        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def create(self, serializer):
-        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
-        serializer.save(user=self.request.user, author=author)
+    @subscribe.mapping.delete
+    def del_subscribe(self, request, id=None):
+        user = request.user
+        author = get_object_or_404(User, id=id)
+        if user == author:
+            return Response({
+                'errors': 'Ошибка отписки, нельзя отписываться от самого себя'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        follow = Follow.objects.filter(user=user, author=author)
+        if not follow.exists():
+            return Response({
+                'errors': 'Ошибка отписки, вы уже отписались'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        follow.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def destroy(self, request, *args, **kwargs):
-        author = get_object_or_404(User, id=self.kwargs.get('author_id'))
-        user = self.request.user
-        instance = get_object_or_404(Follow, author=author, user=user)
-        instance.delete()
+    @action(detail=False, permission_classes=[IsAuthenticated])
+    def subscriptions(self, request):
+        user = request.user
+        queryset = Follow.objects.filter(user=user)
+        pages = self.paginate_queryset(queryset)
+        serializer = FollowSerializer(
+            pages,
+            many=True,
+            context={'request': request}
+        )
+        return self.get_paginated_response(serializer.data)
+    # model = Follow
+    # serializer_class = FollowSerializer
+    # permission_classes = (IsAuthenticated)
+
+    # def get_queryset(self):
+    #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    #     return Follow.objects.filter(author=author)
+
+    # def create(self, serializer):
+    #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    #     serializer.save(user=self.request.user, author=author)
+
+    # def destroy(self, request, *args, **kwargs):
+    #     author = get_object_or_404(User, id=self.kwargs.get('author_id'))
+    #     user = self.request.user
+    #     instance = get_object_or_404(Follow, author=author, user=user)
+    #     instance.delete()
