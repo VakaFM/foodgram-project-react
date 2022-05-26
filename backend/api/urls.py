@@ -2,18 +2,18 @@ from django.urls import include, path
 from djoser.views import TokenCreateView, TokenDestroyView
 from rest_framework.routers import SimpleRouter
 
-from .views import (FavoriteViewSet, FollowChangeViewSet,
+from .views import (FavoriteViewSet, FollowChangeViewSet, FollowViewSet,
                     IngredientViewSet, ModUserViewSet, RecipeViewSet,
                     ShoppingCartViewSet, TagViewSet)
 
 router_v1 = SimpleRouter()
 router_v1.register('tags', TagViewSet)
-router_v1.register('users', FollowChangeViewSet)
+router_v1.register('users', ModUserViewSet)
 router_v1.register('recipes', RecipeViewSet)
 router_v1.register('ingredients', IngredientViewSet)
-# router_v1.register('users/subscriptions',
-#                   FollowViewSet,
-#                   basename='subscriptions')
+router_v1.register('users/subscriptions',
+                   FollowViewSet,
+                   basename='subscriptions')
 
 
 urlpatterns = [
@@ -31,7 +31,7 @@ urlpatterns = [
                                       })),
     path('recipes/<int:recipe_id>/favorite/',
          FavoriteViewSet.as_view({'post': 'create', 'delete': 'destroy'})),
-    # path('users/<int:author_id>/subscribe/',
-    #    FollowChangeViewSet.as_view({'post': 'create', 'delete': 'destroy'})),
+    path('users/<int:author_id>/subscribe/',
+         FollowChangeViewSet.as_view({'post': 'create', 'delete': 'destroy'})),
     path('', include(router_v1.urls))
 ]
