@@ -150,15 +150,18 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
-        image = validated_data.pop('image')
-        recipe = Recipe.objects.create(image=image, **validated_data)
+        recipe = Recipe.objects.create(author=self.context.get(
+            'request'
+        ).user, **validated_data)
         recipe.tags.set(tags)
-        set_of_ingredients = [RecipeIngredient(
-            recipe=recipe, ingredient=get_object_or_404(
-                Ingredient, id=item['ingredient']['id']), amount=item[
-                    'amount']) for item in ingredients]
-        RecipeIngredient.objects.bulk_create(set_of_ingredients)
-
+        recipe.save()
+        for elem in ingredients:
+            ingredient = elem.pop('id')
+            RecipeIngredient.objects.create(
+                recipe=recipe,
+                ingredient=ingredient,
+                **elem
+            )
         return recipe
 
     def update(self, instance, validated_data):
