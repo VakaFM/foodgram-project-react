@@ -35,7 +35,7 @@ class Recipe(models.Model):
         verbose_name='автор рецепта')
     name = models.CharField('название рецепта', max_length=200)
     image = models.ImageField(verbose_name='Картинка',
-                              blank=True, null=True)
+                              blank=False, null=False)
     text = models.TextField(verbose_name='Рецепт')
     ingredients = models.ManyToManyField(Ingredient,
                                          verbose_name='Ингредиенты',
