@@ -181,20 +181,42 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ('__all__')
 
-    def validate(self, data):
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if request.method == 'DELETE':
-            return data
-        author_id = request.parser_context.get('kwargs').get('author_id')
-        author = get_object_or_404(User, id=author_id)
-        user = self.context['request'].user
-        if author == user:
-            raise serializers.ValidationError(
-                'Глупо подписываться на себя)')
-        if Follow.objects.filter(author=author, user=user).exists():
-            raise serializers.ValidationError(
-                'Такая подписка уже есть')
-        return data
+        return Follow.objects.filter(
+            author=obj.author, user=request.user
+        ).exists()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        if request.GET.get('recipe_limit'):
+            recipe_limit = int(request.GET.get('recipe_limit'))
+            queryset = Recipe.objects.filter(
+                author=obj.author)[:recipe_limit]
+        else:
+            queryset = Recipe.objects.filter(
+                author=obj.author)
+        serializer = RecipeSerializer(
+            queryset, read_only=True, many=True
+        )
+        return serializer.data
+
+    def get_recipes_count(self, obj):
+        return obj.author.recipes.count()
+    # def validate(self, data):
+    #     request = self.context.get('request')
+    #     if request.method == 'DELETE':
+    #         return data
+    #     author_id = request.parser_context.get('kwargs').get('author_id')
+    #     author = get_object_or_404(User, id=author_id)
+    #     user = self.context['request'].user
+    #     if author == user:
+    #         raise serializers.ValidationError(
+    #             'Глупо подписываться на себя)')
+    #     if Follow.objects.filter(author=author, user=user).exists():
+    #         raise serializers.ValidationError(
+    #             'Такая подписка уже есть')
+    #     return data
 
 
 class IngredientSerializer(serializers.ModelSerializer):

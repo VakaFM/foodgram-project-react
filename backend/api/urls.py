@@ -7,9 +7,9 @@ from .views import (FavoriteViewSet, FollowChangeViewSet, FollowViewSet,
                     ShoppingCartViewSet, TagViewSet)
 
 router_v1 = SimpleRouter()
-router_v1.register('users/subscriptions/',
-                   FollowViewSet,
-                   basename='subscriptions')
+# router_v1.register('users/subscriptions/',
+#                    FollowViewSet,
+#                    basename='subscriptions')
 router_v1.register('tags', TagViewSet)
 router_v1.register('users', ModUserViewSet)
 router_v1.register('recipes', RecipeViewSet)
@@ -22,6 +22,7 @@ urlpatterns = [
     path('auth/token/logout/', TokenDestroyView.as_view(), name='logout'),
     path('users/', ModUserViewSet.as_view({'get': 'list',
                                            'post': 'create', })),
+    path('users/subscriptions/', FollowViewSet.as_view()),
     path('users/me/',
          ModUserViewSet.as_view({'get': 'me'}),
          name='me'),
