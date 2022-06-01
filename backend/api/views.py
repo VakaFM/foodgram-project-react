@@ -92,18 +92,6 @@ class ModUserViewSet(UserViewSet):
             )
         )
 
-    @action(detail=False, permission_classes=[IsAuthenticated])
-    def subscriptions(self, request):
-        user = request.user
-        queryset = Follow.objects.filter(user=user)
-        pages = self.paginate_queryset(queryset)
-        serializer = FollowSerializer(
-            pages,
-            many=True,
-            context={'request': request}
-        )
-        return self.get_paginated_response(serializer.data)
-
 
 class ShoppingCartViewSet(FavoritMixin):
     model = ShoppingCart
@@ -123,7 +111,6 @@ class FollowViewSet(GenericViewSet, ListModelMixin):
     model = Follow
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
-    pagination_class = CustomPaginator
 
     def get_queryset(self):
         user_id = self.request.user.id
@@ -141,7 +128,6 @@ class FollowChangeViewSet(FollowMixin):
     model = Follow
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated)
-    pagination_class = CustomPaginator
 
     def get_queryset(self):
         author = get_object_or_404(User, id=self.kwargs.get('author_id'))
