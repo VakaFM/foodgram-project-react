@@ -7,13 +7,13 @@ from .views import (FavoriteViewSet, FollowChangeViewSet, FollowViewSet,
                     ShoppingCartViewSet, TagViewSet)
 
 router_v1 = SimpleRouter()
+router_v1.register('users/subscriptions/',
+                   FollowViewSet,
+                   basename='subscriptions')
 router_v1.register('tags', TagViewSet)
 router_v1.register('users', ModUserViewSet)
 router_v1.register('recipes', RecipeViewSet)
 router_v1.register('ingredients', IngredientViewSet)
-router_v1.register('users/subscriptions',
-                   FollowViewSet,
-                   basename='subscriptions')
 
 
 urlpatterns = [
