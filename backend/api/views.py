@@ -131,7 +131,7 @@ class FollowChangeViewSet(FollowMixin):
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated)
 
-    def subscribe(request, user_id=None):
+    def subscribe(self, request, user_id=None):
         if request.method == 'POST':
             user = get_object_or_404(User, username=request.user.username)
             author = get_object_or_404(User, id=user_id)
