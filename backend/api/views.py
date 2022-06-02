@@ -132,7 +132,7 @@ class FollowViewSet(ListAPIView):
 
 class FollowChangeViewSet(views.APIView):
     serializer_class = FollowSerializer
-    permission_classes = (IsAuthenticated)
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request, pk):
         author = get_object_or_404(User, pk=pk)
