@@ -113,6 +113,7 @@ class FavoriteViewSet(FavoritMixin):
 class FollowViewSet(ListAPIView):
     serializer_class = FollowSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPaginator
 
     def get_queryset(self):
         user = self.request.user
@@ -133,6 +134,7 @@ class FollowViewSet(ListAPIView):
 class FollowChangeViewSet(views.APIView):
     serializer_class = FollowSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPaginator
 
     def post(self, request, pk):
         author = get_object_or_404(User, pk=pk)
