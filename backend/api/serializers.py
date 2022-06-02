@@ -174,11 +174,8 @@ class FollowSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     recipes_count = serializers.IntegerField(read_only=True)
-    is_subscribed = serializers.SerializerMethodField(
-        method_name='get_is_subscribed')
+    is_subscribed = serializers.BooleanField(read_only=True)
     recipes = serializers.SerializerMethodField(read_only=True)
-    recipes_count = serializers.SerializerMethodField(
-        method_name='get_recipes_count')
 
     class Meta:
         model = Follow
@@ -198,14 +195,6 @@ class FollowSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Такая подписка уже есть')
         return data
-
-    def get_recipes_count(self, obj):
-        return obj.author.recipes.count()
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        return Follow.objects.filter(
-            author=obj.author, user=request.user).exists()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
