@@ -46,7 +46,7 @@ class IngredientViewSet(ListRetriveViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = [IsAdminOrReadOnly, ]
     pagination_class = CustomPaginator
     filter_backends = (DjangoFilterBackend,)
     filterset_class = FilterRecipe
@@ -112,7 +112,7 @@ class FavoriteViewSet(FavoritMixin):
 
 class FollowViewSet(ListAPIView):
     serializer_class = FollowSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -132,7 +132,7 @@ class FollowViewSet(ListAPIView):
 
 class FollowChangeViewSet(views.APIView):
     serializer_class = FollowSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         author = get_object_or_404(User, pk=pk)
